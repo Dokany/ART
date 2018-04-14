@@ -47,8 +47,8 @@ class image_converter:
 			# equ = cv2.equalizeHist(cv_image)
 
 			# Converting Image to HSV and Grayscale Images
-			hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
-			gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+			hsv = cv2.cvtColor(hough_img, cv2.COLOR_BGR2HSV)
+			gray = cv2.cvtColor(hough_img, cv2.COLOR_BGR2GRAY)
 
 			# White Daylight
 			lower_white = np.array([0, 0, 0])
@@ -91,7 +91,6 @@ class image_converter:
 
 			# Thresholding image post segmentation into binary values
 			threshold = 12
-			output = cv2.cvtColor(output, cv2.COLOR_BRG2GRAY)
 			_, thresh = cv2.threshold(output, threshold, 255, cv2.THRESH_BINARY)
 
 			# To view segmentation output
