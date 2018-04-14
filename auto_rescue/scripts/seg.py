@@ -15,7 +15,7 @@ import numpy as np
 class image_converter:
 
 	def __init__(self):
-    	# Published Topics
+		# Published Topics
 		self.cx_pub = rospy.Publisher("state", Float64, queue_size=10)
 		self.cam_pub = rospy.Publisher("setpoint", Float64, queue_size=10)
 		self.turn_pub = rospy.Publisher("turn_angle", Float64, queue_size=10)
@@ -127,7 +127,7 @@ class image_converter:
 					cx = int(M['m10'] / M['m00'])
 					cy = int(M['m01'] / M['m00'])
 					print("Contour X: %s" % cx)		# State Value
-			 		#print(width)  # Setpoint Value
+					#print(width)  # Setpoint Value
 					#print("Contour Y: %s" % cy)
 				else:
 					blind = True
