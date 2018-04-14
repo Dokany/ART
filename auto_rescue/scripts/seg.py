@@ -120,7 +120,7 @@ class image_converter:
 					if area > larea:
 						lcnt = cnt
 						larea = area
-				if larea > 600:
+				if larea > 60:
 					cv2.drawContours(output, lcnt, -1, (0, 255, 0), 3)
 					M = cv2.moments(lcnt)
 					cx = int(M['m10'] / M['m00'])
