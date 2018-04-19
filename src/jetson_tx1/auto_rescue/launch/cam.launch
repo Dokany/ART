@@ -1,0 +1,7 @@
+<launch>
+	<node pkg="auto_rescue" type="seg.py" name="seg" ns="jetson" output="screen">
+	</node>
+	<node pkg="usb_cam" type="usb_cam_node" name="usb_cam" ns="jetson" >
+	    <param name="video_device"  value="/dev/video1"/>
+	</node>
+</launch>

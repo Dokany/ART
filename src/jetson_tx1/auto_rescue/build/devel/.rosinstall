@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/nvidia/catkin_ws/src/auto_rescue/build/devel/setup.sh

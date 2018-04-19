@@ -1,0 +1,5 @@
+<launch>	
+	<node pkg="auto_rescue" type="master_control.py" name="master_control_jetson" output="screen">
+	</node>
+	<node pkg="auto_rescue" type="wheels.py" name="wheels" ns="jetson" ></node>
+</launch>

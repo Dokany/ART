@@ -1,0 +1,12 @@
+<launch>
+
+	<node pkg="auto_rescue" type="IMU_reader.py" name="IMU_reader" ns="pi" >
+	</node>
+
+	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter_node"  ns="pi">
+			<param name="use_mag"  value="false"/>
+	</node>
+
+	<node pkg="auto_rescue" type="IMU_filter.py" name="IMU_filter" output="screen" ns="pi" >
+	</node>
+</launch>

@@ -1,0 +1,6 @@
+<launch>
+	<node pkg="auto_rescue" type="seg.py" name="seg" ns="pi" output="screen">
+	</node>
+	<node pkg="usb_cam" type="usb_cam_node" name="usb_cam" ns="pi" >
+	</node>
+</launch>

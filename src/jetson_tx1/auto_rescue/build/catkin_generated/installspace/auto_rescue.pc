@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: auto_rescue
+Description: Description of auto_rescue
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: 

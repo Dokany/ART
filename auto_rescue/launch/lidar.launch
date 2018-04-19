@@ -1,5 +1,0 @@
-<launch>
-	<node pkg="auto_rescue" type="lidar_obstacle.py" name="lidar_obstacle" output="screen">
-	</node>
-	<include file="$(find sweep_ros)/launch/sweep2scan.launch"/>
-</launch>

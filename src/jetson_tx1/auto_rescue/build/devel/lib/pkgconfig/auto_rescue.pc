@@ -1,0 +1,8 @@
+prefix=/home/nvidia/catkin_ws/src/auto_rescue/build/devel
+
+Name: auto_rescue
+Description: Description of auto_rescue
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/nvidia/catkin_ws/src/auto_rescue/build/devel/lib 
+Requires: 
