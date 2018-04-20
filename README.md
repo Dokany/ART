@@ -1,4 +1,4 @@
-# A.R.T | Automated rescue Team
+# A.R.T | Automated Rescue Team
 A team composed of 5 robot cars, one patrolling car that autonomously monitors and detects emergencies; which can be medical emergencies, structure fires and acts of violence, and dispaches one or more of the respective emergency-handling robot cars; which can be an ambulance, a fire truck and/or a police car.
 
 The patrolling car is equipped with a Jetson TX1 board, Pololu TReX Motor Controller, IMU connected through an Arduino board, and an additional USB camera to the Jetson's built in camera.
