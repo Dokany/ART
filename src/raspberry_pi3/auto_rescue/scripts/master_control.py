@@ -61,6 +61,7 @@ class master_control:
 
     def callback0(self, data): #dispatch
         self.dispatch=data.data
+        print("dispatched!")
 
     def callback5(self, data): #blind
         self.blind=data.data
@@ -93,11 +94,12 @@ class master_control:
 
     def callback4(self, data):  # direction
         self.direction=int(data.data)
+        print("direction got: ", data.data)
         #self.work()
 
     def work(self):
         rate = rospy.Rate(50)
-
+        self.switch_cam = 0
         while not rospy.is_shutdown():
             self.upper = 0
             self.current_state=self.next_state
@@ -106,6 +108,8 @@ class master_control:
             right = 0
             dir = 0
             self.pid = 0
+            self.upper = 0
+
             if(self.current_state == IDLE_STATE):
                 if(self.dispatch):
                     self.next_state = DRIVE_STATE
@@ -117,7 +121,14 @@ class master_control:
 
 
             elif(self.current_state == DRIVE_STATE):
-                if (self.blind == 0):
+                if (self.blind):
+
+                    rospy.sleep(0.7)
+                    self.next_state = INTERSECTION_STATE
+
+                else:
+                    if(self.switch_cam):
+                        self.switch_cam = 0
                     self.next_state = DRIVE_STATE
                     left = 50 - self.lmotor
                     right = 50 + self.lmotor
@@ -133,40 +144,21 @@ class master_control:
                         #rospy.sleep(0.2)
                         self.upper = 0
                     dir = 0
-                elif(self.switch_cam):
-                    self.switch_cam=0
-                    rospy.sleep(2)
-                    self.upper = 1
-                else:
-
-                    rospy.sleep(0.7)
-                    self.next_state = INTERSECTION_STATE
-                    try:
-                        v=Vector3()
-                        self.req_pub.publish(v)
-                    except Exception as e:
-                        print(e)
-                    #print("DIRECTION : ",self.direction)
-                    # if(self.direction==0):
-                    #
-                    #     self.switch_cam = 1
-                    #     self.next_state = DRIVE_STATE
-                    # else:
-                    #     dir=self.direction
-                    #     self.start=0
-                    #     self.next_state = ROTATE_STATE
-                    #
-                    # self.request = 0
-                self.pid = 1
 
             elif(self.current_state == INTERSECTION_STATE):
                 if(self.direction==-1):
                     self.next_state= INTERSECTION_STATE
                 elif(self.direction==0):
-                    self.next_state=DRIVE_STATE
+                    if(self.switch_cam == 0):
+                        self.switch_cam = 1
+                        self.next_state = INTERSECTION_STATE
+                    else:
+                        self.next_state=DRIVE_STATE
+                        self.switch_cam = 0
                 else:
                     self.next_state = ROTATE_STATE
                     left=right=0
+                    self.switch_cam = 1
                     dir=self.direction
                     self.start=0
                 self.direction=-1
