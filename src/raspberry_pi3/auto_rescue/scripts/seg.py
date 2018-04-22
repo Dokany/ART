@@ -61,8 +61,8 @@ class image_converter:
             #upper_white = np.array([0, 0, 255])
 
             # White Night
-            lower_white = np.array([0, 0, 0])
-            upper_white = np.array([10, 0, 255])
+            #lower_white = np.array([0, 0, 0])
+            #upper_white = np.array([10, 0, 255])
 
             # Yellow Masks
             # lower_yellow = np.array([20, 100, 100])
@@ -73,9 +73,9 @@ class image_converter:
             #mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
             # Daylight
-            #mask_white = cv2.inRange(gray, 200, 255)
+            mask_white = cv2.inRange(gray, 200, 255)
             # Night
-            mask_white = cv2.inRange(gray, 60, 255)
+            #mask_white = cv2.inRange(gray, 60, 255)
             # Lab - Night
             #mask_white = cv2.inRange(gray, 200, 255)
 
@@ -92,7 +92,6 @@ class image_converter:
             if (upperHalf):
                 output = output[0:height, 0:np.size(output, 1)]
                 cv_image = cv_image[0:(np.size(cv_image, 0))/2, 0:np.size(cv_image, 1)]
-
             # Lower Half
             else:
                 output = output[height:np.size(output, 0), 0:np.size(output, 1)]
@@ -103,8 +102,8 @@ class image_converter:
             _, thresh = cv2.threshold(output, threshold, 255, cv2.THRESH_BINARY)
 
             # To view segmentation output
-            #cv2.imshow("Segmentation", output)
-            #cv2.waitKey(3)
+            cv2.imshow("Segmentation", output)
+            cv2.waitKey(3)
 
             # To view thresholding output
             #cv2.imshow("Thresholding", thresh)
@@ -130,7 +129,7 @@ class image_converter:
                         lcnt = cnt
                         larea = area
                 if larea > 45:
-                    cv2.drawContours(output, lcnt, -1, (0, 255, 0), 3)
+                    cv2.drawContours(cv_image, lcnt, -1, (0, 255, 0), 3)
                     M = cv2.moments(lcnt)
                     cx = int(M['m10'] / M['m00'])
                     cy = int(M['m01'] / M['m00'])
