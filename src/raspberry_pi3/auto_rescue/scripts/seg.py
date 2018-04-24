@@ -73,7 +73,7 @@ class image_converter:
             #mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
             # Daylight
-            mask_white = cv2.inRange(gray, 200, 255)
+            mask_white = cv2.inRange(gray, 190, 255)
             # Night
             #mask_white = cv2.inRange(gray, 60, 255)
             # Lab - Night
@@ -102,8 +102,8 @@ class image_converter:
             _, thresh = cv2.threshold(output, threshold, 255, cv2.THRESH_BINARY)
 
             # To view segmentation output
-            cv2.imshow("Segmentation", output)
-            cv2.waitKey(3)
+            #cv2.imshow("Segmentation", output)
+            #cv2.waitKey(3)
 
             # To view thresholding output
             #cv2.imshow("Thresholding", thresh)
@@ -128,7 +128,7 @@ class image_converter:
                     if area > larea:
                         lcnt = cnt
                         larea = area
-                if larea > 45:
+                if larea > 40:
                     cv2.drawContours(cv_image, lcnt, -1, (0, 255, 0), 3)
                     M = cv2.moments(lcnt)
                     cx = int(M['m10'] / M['m00'])
