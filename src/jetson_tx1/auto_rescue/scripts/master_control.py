@@ -23,7 +23,7 @@ BUILDING_STATE = 2
 STRAIGHT = 8
 RIGHT = 9
 LEFT = 10
-PID_RATIO = 50.0/1000.0
+PID_RATIO = 75.0/1000.0
 class master_control:
 
     def __init__(self):
@@ -140,8 +140,12 @@ class master_control:
 	                self.next_state = IDLE_STATE
                 elif (self.barcode == ""):
                     self.next_state = DRIVE_STATE
-                    left = 50 + self.lmotor
-                    right = 50 - self.lmotor
+                    left = 35
+                    right = 35
+                    if(self.lmotor<0):
+                        right += abs(self.lmotor)
+                    else:
+                        left+=self.lmotor
                     if(left<0):
                         left = 0
                     if(right<0):
@@ -161,6 +165,7 @@ class master_control:
                 except Exception as e:
                     print(e)
                 self.pi_requestx = self.pi_requesty = -1
+                self.next_state = IDLE_STATE
                 # if(self.prediction==""):
                 #     self.enable_ml = 1
                 #     self.next_state = BUILDING_STATE
@@ -203,7 +208,7 @@ class master_control:
             try:
                 self.wheels_publish.publish(v)
                 self.pid_publish.publish(pid_bool)
-                self.disp_pub.publish(db)
+                #self.disp_pub.publish(db)
                 self.ml_pub.publish(mb)
             except Exception as e:
                 print(e)

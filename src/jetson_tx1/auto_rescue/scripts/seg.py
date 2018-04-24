@@ -45,19 +45,23 @@ class image_converter:
             # Blur Filters
             hough_img = cv2.GaussianBlur(hough_img, (5, 5), 0)
             #hough_img = cv2.medianBlur(hough_img, 5)
-            # hough_img = cv2.equalizeHist(hough_img)
+            #hough_img = cv2.equalizeHist(hough_img)
 
             # Converting Image to HSV and Grayscale Images
+            kernel = np.ones((5, 5), np.uint8)
             hsv = cv2.cvtColor(hough_img, cv2.COLOR_BGR2HSV)
             gray = cv2.cvtColor(hough_img, cv2.COLOR_BGR2GRAY)
+            #img_dilation = cv2.dilate(gray, kernel, iterations= 1)
+            gray = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, kernel)
 
             # White Daylight
             #lower_white = np.array([0, 0, 0])
             #upper_white = np.array([0, 0, 255])
 
             # White Night
-            #lower_white = np.array([0, 0, 0])
-            #upper_white = np.array([10, 0, 255])
+            #sensitiviy = 110
+            #lower_white = np.array([0, 0, 255 - sensitiviy])
+            #upper_white = np.array([255, sensitiviy, 255])
 
             # Yellow Masks
             # lower_yellow = np.array([20, 100, 100])
@@ -70,18 +74,21 @@ class image_converter:
             # Daylight
             #mask_white = cv2.inRange(gray, 180, 255)
             # Night
-            mask_white = cv2.inRange(gray, 115, 255)
+            mask_white = cv2.inRange(gray, 135, 255)
             # Lab - Night
             #mask_white = cv2.inRange(gray, 200, 255)
 
             #mask_yw = cv2.bitwise_or(mask_white, mask_yellow)
-            #mask_color = cv2.inRange(hsv, lower_white, upper_white)
-            #output = cv2.bitwise_and(hsv, hsv, mask=mask_color)
+            #mask_white = cv2.inRange(hsv, lower_white, upper_white)
+            #output = cv2.bitwise_and(hsv, hsv, mask=mask_white)
             output = cv2.bitwise_and(gray, mask_white)
 
             # Declarion of cam center's width
             width = np.size(output, 1) / 2
             height = np.size(output, 0) / 2
+
+            #output = output[height:np.size(output, 0), 0:np.size(output, 1)]
+            #cv_image = cv_image[(np.size(cv_image, 0)) / 2:np.size(cv_image, 0), 0:np.size(cv_image, 1)]
 
             # Image Cropping - not needed anymore
             # Upper Half
@@ -114,11 +121,11 @@ class image_converter:
                 larea = cv2.contourArea(contours[0])
                 for cnt in contours:	# Sorting contour areas found
                     area = cv2.contourArea(cnt)
-                    print(area)
+                    #print(area)
                     if area > larea:
                         lcnt = cnt
                         larea = area
-                if larea > 30:
+                if larea > 25:
                     cv2.drawContours(output, lcnt, -1, (0, 255, 0), 3)
                     M = cv2.moments(lcnt)
                     cx = int(M['m10'] / M['m00'])

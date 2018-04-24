@@ -1,0 +1,14 @@
+yolo_model:
+
+  config_file:
+    name: tiny-custom.cfg
+  weight_file:
+    name: tiny-custom_2400.weights
+  threshold:
+    value: 0.5
+  detection_classes:
+    names:
+      - fire
+      - injury
+      - robbery
+ 

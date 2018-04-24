@@ -7,7 +7,7 @@
       <param name="Kd" value="0.4" />
       <param name="upper_limit" value="1000" />
       <param name="lower_limit" value="-1000" />
-      <param name="windup_limit" value="10" />
+      <param name="windup_limit" value="1" />
       <param name="max_loop_frequency" value="100.0" />
       <param name="min_loop_frequency" value="100.0" />
       <remap from="setpoint" to="/jetson/setpoint" />
