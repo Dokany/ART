@@ -51,12 +51,12 @@ class image_converter:
 			# Converting Image to HSV
 			hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-			# Daylight Yellow Masks
-			#lower_yellow = np.array([30, 50, 50])
-			#upper_yellow = np.array([105, 255, 255])
+			# Daylight - Shade Yellow Masks
+			lower_yellow = np.array([15, 40, 80])
+			upper_yellow = np.array([45, 255, 255])
 			# Night Yellow Masks
-			lower_yellow = np.array([21, 132, 70])
-			upper_yellow = np.array([112, 255, 255])
+			#lower_yellow = np.array([21, 132, 70])
+			#upper_yellow = np.array([112, 255, 255])
 			#lower_yellow = np.array([10, 136, 90])
 			#upper_yellow = np.array([91, 255, 255])
 
@@ -70,7 +70,7 @@ class image_converter:
 			# To view segmentation seg_img
 			#cv2.imshow("Segmentation", seg_img)
 			#cv2.waitKey(3)
-
+3
 			# To view thresholding seg_img
 			#cv2.imshow("Thresholding", thresh)
 			#cv2.waitKey(3)

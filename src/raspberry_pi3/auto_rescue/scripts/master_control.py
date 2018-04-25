@@ -120,7 +120,7 @@ class master_control:
                     self.reply = -1 #initialize reply as invalid
                     self.next_state = DRIVE_STATE
                     
-            elif(self.current_state = LOST_STATE):
+            elif(self.current_state == LOST_STATE):
                 print("LOST! HELP! JOHN EL SABAB")
                 
             elif(self.current_state == DRIVE_STATE):
@@ -195,6 +195,7 @@ class master_control:
                 
             elif(self.current_state == PARK_STATE):
                 #PARK
+                pass
                 
             else: #ROTATE
                 if(self.start==0):

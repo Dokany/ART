@@ -56,22 +56,6 @@ class image_converter:
             hsv = cv2.cvtColor(hough_img, cv2.COLOR_BGR2HSV)
             gray = cv2.cvtColor(hough_img, cv2.COLOR_BGR2GRAY)
 
-            # White Daylight
-            #lower_white = np.array([0, 0, 0])
-            #upper_white = np.array([0, 0, 255])
-
-            # White Night
-            #lower_white = np.array([0, 0, 0])
-            #upper_white = np.array([10, 0, 255])
-
-            # Yellow Masks
-            # lower_yellow = np.array([20, 100, 100])
-            # upper_yellow = np.array([30, 255, 255])
-            # lower_yellow = np.array([20, 100, 100])
-            # upper_yellow = np.array([30, 255, 255])
-
-            #mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
-
             # Daylight
             mask_white = cv2.inRange(gray, 190, 255)
             # Night
@@ -79,7 +63,6 @@ class image_converter:
             # Lab - Night
             #mask_white = cv2.inRange(gray, 200, 255)
 
-            #mask_yw = cv2.bitwise_or(mask_white, mask_yellow)
             output = cv2.bitwise_and(gray, mask_white)
 
             # Declarion of cam center's width
