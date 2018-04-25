@@ -74,9 +74,9 @@ class image_converter:
             # Daylight
             #mask_white = cv2.inRange(gray, 180, 255)
             # Night
-            mask_white = cv2.inRange(gray, 135, 255)
+            #mask_white = cv2.inRange(gray, 135, 255)
             # Lab - Night
-            #mask_white = cv2.inRange(gray, 200, 255)
+            mask_white = cv2.inRange(gray, 180, 255)
 
             #mask_yw = cv2.bitwise_or(mask_white, mask_yellow)
             #mask_white = cv2.inRange(hsv, lower_white, upper_white)
@@ -98,12 +98,12 @@ class image_converter:
             _, thresh = cv2.threshold(output, threshold, 255, cv2.THRESH_BINARY)
 
             # To view segmentation output
-            cv2.imshow("Segmentation", output)
-            cv2.waitKey(3)
+            #cv2.imshow("Segmentation", output)
+            #cv2.waitKey(3)
 
             # To view thresholding output
-            #cv2.imshow("Thresholding", thresh)
-            #cv2.waitKey(3)
+            cv2.imshow("Thresholding", thresh)
+            cv2.waitKey(3)
 
             inter_angle = 0		# Intersection Angle
 
