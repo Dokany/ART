@@ -43,10 +43,10 @@ class master_control:
         rospy.init_node('MASTER_CONTROL', anonymous=True)
         self.wheels_publish = rospy.Publisher("pi/wheels_speed",Vector3Stamped, queue_size=10)
         self.pid_publish = rospy.Publisher("pi/pid_start", Bool, queue_size=10)        
-        self.sd_sub = rospy.Subscriber("reply_pi", Float32, self.callback0)
+        self.sd_sub = rospy.Subscriber("reply_ff", Float32, self.callback0)
         self.angles_sub = rospy.Subscriber("pi/imu_angles",Vector3Stamped, self.callback1)
         self.pid_sub = rospy.Subscriber("pi/control_effort", Float64, self.callback2)
-        self.disp = rospy.Subscriber("dispatch_pi", Bool, self.callback3)
+        self.disp = rospy.Subscriber("dispatch_ff", Bool, self.callback3)
         self.blind = rospy.Subscriber("pi/blind", Bool, self.callback4)
         self.cam_pub = rospy.Publisher("pi/camera", Bool, queue_size = 10)
         #NEW
@@ -96,9 +96,8 @@ class master_control:
         self.prev_unique_state = 0
         self.motor=0
         self.reply = -1
-        self.dispatch = 0
         self.blind = 0
-        self.direction = 0
+        self.dispatch = 0
         self.junction = 0
         self.visit_done = 0
         dir = 0
@@ -114,8 +113,9 @@ class master_control:
             self.request = 0
 
             if(self.current_state == IDLE_STATE):
-                if(self.dispatch==0):
+                if(self.blind):
                     self.next_state = IDLE_STATE
+                    self.dispatch = 0
                 else:                    
                     self.reply = -1 #initialize reply as invalid
                     self.next_state = DRIVE_STATE
@@ -137,8 +137,12 @@ class master_control:
                     self.request = 1
                 else:
                     self.pid = 1
-                    left = 50 - self.lmotor
-                    right = 50 + self.lmotor
+                    right = 50
+                    left = 50
+                    if(self.motor>=0):
+                        left -= self.motor
+                    else:
+                        right +=self.motor
                     dir = 0
                     if(left<0):
                         left = 0
