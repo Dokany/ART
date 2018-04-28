@@ -20,31 +20,44 @@ import numpy as np
 IDLE_STATE = 0
 DRIVE_STATE = 1
 BUILDING_STATE = 2
-STRAIGHT = 8
-RIGHT = 9
-LEFT = 10
-PID_RATIO = 75.0/1000.0
+LOST_STATE = 3
+
+
+INSTR_WAIT = 0
+INSTR_RIGHT = 1
+INSTR_LEFT = 2
+INSTR_STRAIGHT = 3
+INSTR_DEST_LEFT = 4
+INSTR_DEST_RIGHT = 5
+INSTR_PARK = 6
+
+PID_RATIO = 80.0/1000.0
+
+
 class master_control:
 
     def __init__(self):
-        rospy.init_node('MASTER_CONTROL_jet', anonymous=True)
+        rospy.init_node('MASTER_CONTROL', anonymous=True)
         self.wheels_publish = rospy.Publisher("jetson/wheels_speed",Vector3Stamped, queue_size=10)
         self.pid_publish = rospy.Publisher("jetson/pid_start", Bool, queue_size=10)
-        self.angles_sub = rospy.Subscriber("jetson/imu_angles",Vector3Stamped, self.callback1)
-        self.lw_sub = rospy.Subscriber("jetson/left_wheel/control_effort", Float64, self.callback2)
-        self.rw_sub = rospy.Subscriber("jetson/right_wheel/control_effort", Float64, self.callback3)
-        self.sd_pub = rospy.Publisher("sign_direction_pi", Float32, self.callback4)
-        self.disp_pub = rospy.Publisher("dispatch_pi", Bool,  queue_size=10)
+        self.sd_pub_ff = rospy.Publisher("reply_ff", Float32,  queue_size=10)
+        self.sd_pub_amb = rospy.Publisher("reply_amb", Float32,  queue_size=10)
+        self.sd_pub_pol = rospy.Publisher("reply_pol", Float32,  queue_size=10)
+        self.disp_pub_ff = rospy.Publisher("dispatch_ff", Bool,  queue_size=10)
+        self.disp_pub_amb = rospy.Publisher("dispatch_amb", Bool,  queue_size=10)
+        self.disp_pub_pol = rospy.Publisher("dispatch_pol", Bool,  queue_size=10)
+              
         self.bar_sub = rospy.Subscriber("barcode", String, self.callback0)
-        self.cam_sub = rospy.Subscriber("jetson/blind", Bool, self.callback5)
-        self.req_sub = rospy.Subscriber("pi_request", Vector3, self.callback6)
-        self.pred_sub = rospy.Subscriber("prediction", String, self.callback7)
-        self.ml_pub = rospy.Publisher("ml_test", Bool, queue_size = 10)
+        self.cam_sub = rospy.Subscriber("jetson/blind", Bool, self.callback1)
+        self.req_sub = rospy.Subscriber("pi_request", Bool, self.callback2)
+        self.ml_sub = rospy.Subscriber("/darknet_ros/class_detected", Vector3,  self.callback3)
+        self.lw_sub = rospy.Subscriber("jetson/control_effort", Float64, self.callback4)  
+        
         self.roll = 0
         self.upper = 0
+        self.yaw = 0
         self.pid = 0
         self.pitch = 0
-        self.yaw = 0
         self.rotate = 0
         self.angle = 0
         self.cnt = 0
@@ -53,70 +66,42 @@ class master_control:
         self.stop = 0
         self.current_state = 0
         self.next_state = 0
-        self.lmotor = 0
-        self.rmotor=0
+        self.motor=0
         self.direction = 1
         self.dispatch = 1
         self.blind = 0
         self.pi_dispatch = 0
         self.barcode = ""
-        self.prediction = ""
-        self.pi_requestx = -1
-        self.pi_requesty = -1
+        self.pi_request = 0
         self.p_direction = 0
-    #def getDirection(self, pi_id, x, y):
+        self.class1 = self.class2 = self.class3 = -1
+        
+    def callback0(self,data):# barcode
+        self.barcode=data.data
 
-    def callback4(self,data):
-        self.direction=data.data
-
-    def callback0(self, data):  # barcode
-        self.barcode = data.data
-        print("GOT:", self.barcode)
-
-    def callback5(self, data): #blind
+    def callback1(self, data): #blind 
         self.blind=data.data
         if(self.blind):
             print ("BLIIIINNNDDD")
 
-    def callback6(self, data): #pi_request
-        # self.pi_requestx=data.x
-        # self.pi_requesty=data.y
-        try:
-            f = Float32()
-            f.data=1
-        except Exception as e:
-            print(e)
+    def callback2(self, data): #pi_request
+        self.pi_request = data.data
+        #add ML logic and send reply self.sd_pub_ff(_amb or _pol)
 
-    def callback7(self, data): #pi_request
-        self.prediction = data.data
 
-    def callback1(self,data): #imu
+    def callback3(self, data): #ml
+        self.class1 = data.x
+        self.class2 = data.y
+        self.class3 = data.z
+                
+    def callback4(self, data): #motor
+        self.motor = int((data.data) * PID_RATIO)
 
-        self.roll = data.vector.x
-        self.pitch = data.vector.y
-        self.yaw = data.vector.z
-        if (self.yaw < 0):
-            self.yaw = 360 + self.yaw
-        #self.work()
-
-    def callback2(self, data): #left
-        # if(data.data<0):
-        # 	self.lmotor=0
-        # else:
-        self.lmotor=int((data.data)*PID_RATIO)
-
-        #self.work()
-
-    def callback3(self, data): #right
-        # if (data.data< 0):
-        # 	self.rmotor = 0
-        # else:
-        self.rmotor = int((data.data) * PID_RATIO)
-        #self.work()
-
+    
 
     def work(self):
         rate = rospy.Rate(50)
+        demo = 0
         while not rospy.is_shutdown():
             self.upper = 0
             self.current_state=self.next_state
@@ -124,68 +109,60 @@ class master_control:
             left = 0
             right = 0
             dir = 0
-            self.enable_ml = 0
             self.pi_dispatch = 0
             self.pid = 1
             if(self.current_state == IDLE_STATE):
                 if(self.blind == 0):
                     self.next_state = DRIVE_STATE
-                    dir = 0
                 else:
                     self.next_state = IDLE_STATE
 
+            elif(self.current_state == LOST_STATE):
+                print("LOST")
+                self.next_state = LOST_STATE
 
             elif(self.current_state == DRIVE_STATE):
                 if(self.blind):
-	                self.next_state = IDLE_STATE
+                    self.next_state = LOST_STATE
                 elif (self.barcode == ""):
                     self.next_state = DRIVE_STATE
-                    left = 35
-                    right = 35
-                    if(self.lmotor<0):
-                        right += abs(self.lmotor)
+                    left = 40
+                    right = 40
+                    if(self.motor>=0):
+                        left += self.motor
                     else:
-                        left+=self.lmotor
+                        right -=self.motor
                     if(left<0):
                         left = 0
                     if(right<0):
                         right = 0
-                    self.rmotor = self.lmotor = 0
+                    self.motor = 0
                     dir = 0
                 else:
-                    self.enable_ml = 1
                     self.next_state = BUILDING_STATE
-                    self.barcode = ""
+                    self.class1 = self.class2 = self.class3 = -1
 
             else: #BUILDING STATE
-                f = Bool()
-                f = 1
-                try:
-                    self.disp_pub.publish(f)
-                except Exception as e:
-                    print(e)
-                self.pi_requestx = self.pi_requesty = -1
-                self.next_state = IDLE_STATE
-                # if(self.prediction==""):
-                #     self.enable_ml = 1
-                #     self.next_state = BUILDING_STATE
-                # else:
-                #     self.disp_pub = 1
-                #     self.next_state  = DRIVE_STATE
-
-
-
-
-            #if(self.pi_requestx !=-1 or self.pi_requesty!=-1):#handle request TEMP FOR DEMO
-                # self.p_direction = (self.direction+1)
-                # f = Float32()
-                # f = 1
-                # try:
-                #     self.sd_pub.publish(f)
-                # except Exception as e:
-                #     print(e)
-                # self.pi_requestx = self.pi_requesty = -1
-
+                rospy.sleep(0.5)
+                if(self.class1!=-1):#no emergency
+                    self.next_state = DRIVE_STATE
+                else:
+                    print("Got :",self.class1)
+                    #dispatch
+                    b = Bool()
+                    b = True
+                    try:
+                        if(self.class1==0):
+                            self.disp_pub_ff.publish(b)
+                        elif(self.class1==1):
+                            self.disp_pub_amb.publish(b)
+                        else:
+                            self.disp_pub_pol.publish(b)
+                    except Exception as e:
+                        print(e)
+                    self.class1 = self.class2 = self.class3 = -1
+                    self.next_state = DRIVE_STATE
+                
 
             v3 = Vector3()
             v = Vector3Stamped()
@@ -202,14 +179,9 @@ class master_control:
             pid_bool = self.pid
             db = Bool()
             db = self.pi_dispatch
-            mb = Bool()
-            mb = self.enable_ml
-            #print ("left=%d, right=%d"%(left,right))
             try:
                 self.wheels_publish.publish(v)
                 self.pid_publish.publish(pid_bool)
-                #self.disp_pub.publish(db)
-                self.ml_pub.publish(mb)
             except Exception as e:
                 print(e)
             rate.sleep()

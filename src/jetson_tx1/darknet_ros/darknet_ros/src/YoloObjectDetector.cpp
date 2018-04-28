@@ -24,6 +24,7 @@ char *cfg;
 char *weights;
 char *data;
 char **detectionNames;
+ros::Publisher class_pub;
 
 YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh)
     : nodeHandle_(nh),
@@ -139,6 +140,7 @@ void YoloObjectDetector::init()
   int detectionImageQueueSize;
   bool detectionImageLatch;
 
+
   nodeHandle_.param("subscribers/camera_reading/topic", cameraTopicName,
                     std::string("/camera/image_raw"));
   nodeHandle_.param("subscribers/camera_reading/queue_size", cameraQueueSize, 1);
@@ -146,6 +148,7 @@ void YoloObjectDetector::init()
                     std::string("found_object"));
   nodeHandle_.param("publishers/object_detector/queue_size", objectDetectorQueueSize, 1);
   nodeHandle_.param("publishers/object_detector/latch", objectDetectorLatch, false);
+  
   nodeHandle_.param("publishers/bounding_boxes/topic", boundingBoxesTopicName,
                     std::string("bounding_boxes"));
   nodeHandle_.param("publishers/bounding_boxes/queue_size", boundingBoxesQueueSize, 1);
@@ -165,6 +168,10 @@ void YoloObjectDetector::init()
   detectionImagePublisher_ = nodeHandle_.advertise<sensor_msgs::Image>(detectionImageTopicName,
                                                                        detectionImageQueueSize,
                                                                        detectionImageLatch);
+   nodeHandle_.param("publishers/class_detected/topic", detectionImageTopicName,std::string("class_detected"));
+   nodeHandle_.param("publishers/class_detected/queue_size", detectionImageQueueSize, 1);
+   nodeHandle_.param("publishers/class_detected/latch", detectionImageLatch, true);                                                                                                                                  
+   class_pub = nodeHandle_.advertise<geometry_msgs::Vector3>("class_detected", 100, true);
 
   // Action servers.
   std::string checkForObjectsActionName;
@@ -581,7 +588,8 @@ void *YoloObjectDetector::publishInThread()
     std_msgs::Int8 msg;
     msg.data = num;
     objectPublisher_.publish(msg);
-
+    std::vector<int> classes;
+	geometry_msgs::Vector3 det_classes;
     for (int i = 0; i < numClasses_; i++) {
       if (rosBoxCounter_[i] > 0) {
         darknet_ros_msgs::BoundingBox boundingBox;
@@ -599,13 +607,36 @@ void *YoloObjectDetector::publishInThread()
           boundingBox.xmax = xmax;
           boundingBox.ymax = ymax;
           boundingBoxesResults_.bounding_boxes.push_back(boundingBox);
+          
+          if(boundingBox.Class.compare("fire")==0)
+				classes.push_back(0);
+			
+          else if(boundingBox.Class.compare("injury")==0)
+				classes.push_back(1);
+				
+		  else if(boundingBox.Class.compare("robbery")==0)
+
+			classes.push_back(2);
         }
       }
     }
+    int num_det = classes.size();
+    if(num_det>0)
+    {
+		det_classes.y = det_classes.z = -1;
+		det_classes.x = classes[0];
+		if(num_det>1)
+			det_classes.y = classes[1];
+		if(num_det>2)
+			det_classes.z = classes[2];
+		class_pub.publish(det_classes);
+	}
+		
     boundingBoxesResults_.header.stamp = ros::Time::now();
     boundingBoxesResults_.header.frame_id = "detection";
     boundingBoxesResults_.image_header = imageHeader_;
     boundingBoxesPublisher_.publish(boundingBoxesResults_);
+    
   } else {
     std_msgs::Int8 msg;
     msg.data = 0;

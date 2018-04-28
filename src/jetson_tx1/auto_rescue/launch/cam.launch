@@ -3,5 +3,10 @@
 	</node>
 	<node pkg="usb_cam" type="usb_cam_node" name="usb_cam" ns="jetson" >
 	    <param name="video_device"  value="/dev/video1"/>
+	    <param name="focus"  value="0"/>
+
+	</node>
+	<include file="$(find jetson_csi_cam)/jetson_csi_cam.launch"/>
+	<node pkg="zbar_ros" type="barcode_reader_node" name="barcode_reader_node" output="screen">
 	</node>
 </launch>

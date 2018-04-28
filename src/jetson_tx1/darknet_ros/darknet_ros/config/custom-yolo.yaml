@@ -1,9 +1,9 @@
 yolo_model:
 
   config_file:
-    name: tiny-custom.cfg
+    name: yolov2-tiny-voc.cfg
   weight_file:
-    name: tiny-custom_2400.weights
+    name: yolov2-tiny-voc_3000.weights
   threshold:
     value: 0.5
   detection_classes:

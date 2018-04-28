@@ -25,6 +25,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/Point.h>
+#include <geometry_msgs/Vector3.h>
 #include <image_transport/image_transport.h>
 
 // OpenCv
