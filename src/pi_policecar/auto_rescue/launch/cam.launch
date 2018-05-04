@@ -1,0 +1,11 @@
+<launch>
+	<node pkg="auto_rescue" type="seg.py" name="seg" ns="pi_police" output="screen">
+	</node>
+	<node pkg="auto_rescue" type="junction.py" name="junction" ns="pi_police" output="screen">
+	</node>
+	<node pkg="usb_cam" type="usb_cam_node" name="usb_cam" ns="pi_police" >
+	    <param name="video_device"  value="/dev/video0"/>
+	    <param name="focus"  value="0"/>
+
+	</node>
+</launch>

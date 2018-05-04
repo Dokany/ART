@@ -72,9 +72,9 @@ class image_converter:
             #mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
             # Daylight
-            #mask_white = cv2.inRange(gray, 180, 255)
+            mask_white = cv2.inRange(gray, 180, 255)
             # Night
-            mask_white = cv2.inRange(gray, 210, 255)
+            #mask_white = cv2.inRange(gray, 220, 255)
             # Lab - Night
             #mask_white = cv2.inRange(gray, 200, 255)
 

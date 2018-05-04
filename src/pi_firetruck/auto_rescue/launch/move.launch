@@ -1,0 +1,4 @@
+<launch>	
+	<node pkg="auto_rescue" type="master_control.py" name="master_control_pi_fire" output="screen"></node>
+	<node pkg="auto_rescue" ns="pi_fire" type="wheels.py" name="wheels"></node>
+</launch>

@@ -1,4 +1,0 @@
-<launch>	
-	<node pkg="auto_rescue" type="master_control.py" name="master_control_pi" output="screen"></node>
-	<node pkg="auto_rescue" ns="pi" type="wheels.py" name="wheels"></node>
-</launch>
