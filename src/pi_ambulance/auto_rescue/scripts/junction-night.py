@@ -12,9 +12,9 @@ from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 
 
-#####################################
-# THIS IS FOR DAYLIGHT SEGMENTATION #
-#####################################
+##################################
+# THIS IS FOR NIGHT SEGMENTATION #
+##################################
 
 class image_converter:
 
@@ -38,10 +38,6 @@ class image_converter:
 			except CvBridgeError as e:
 				print(e)
 
-			# Show Camera Feed
-			#cv2.imshow("Junction Cam", cv_image)
-			#cv2.waitKey(3)
-
 			# Resizing Frame  For camera frame 640 X 480, image will be 64 x 48
 			cam_width = np.size(cv_image, 1) / 10
 			cam_height = np.size(cv_image, 0) / 10
@@ -56,9 +52,12 @@ class image_converter:
 			# Converting Image to HSV
 			hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-			# Daylight - Shade Yellow Masks
-			lower_yellow = np.array([15, 40, 80])
-			upper_yellow = np.array([45, 255, 255])
+			# Night Yellow Masks
+			lower_yellow = np.array([18, 100, 70])
+			upper_yellow = np.array([112, 255, 255])
+            #Night with lights
+			#lower_yellow = np.array([19, 100, 70])
+			#upper_yellow = np.array([112, 255, 255])
 
 			mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
 			seg_img = cv2.bitwise_and(hsv, hsv, mask=mask_yellow)
