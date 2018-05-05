@@ -12,6 +12,10 @@ from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 
 
+#####################################
+# THIS IS FOR DAYLIGHT SEGMENTATION #
+#####################################
+
 class image_converter:
 
     def __init__(self):
@@ -48,33 +52,28 @@ class image_converter:
             hough_img = cv2.resize(cv_image, (cam_width, cam_height), interpolation=cv2.INTER_AREA)
 
             # Blur Filters
-            #cv_image = cv2.GaussianBlur(cv_image, (5, 5), 0)
-            #cv_image = cv2.medianBlur(cv_image, 5)
-            # equ = cv2.equalizeHist(cv_image)
+            hough_img = cv2.GaussianBlur(hough_img, (5, 5), 0)
+            #hough_img = cv2.medianBlur(hough_img, 5)
+            #hough_img = cv2.equalizeHist(hough_img)
 
-            # Converting Image to HSV and Grayscale Images
-            hsv = cv2.cvtColor(hough_img, cv2.COLOR_BGR2HSV)
+            threshold = 20
+
+            ################################
+            # Using Grayscale Segmentation #
+            ################################
             #gray = cv2.cvtColor(hough_img, cv2.COLOR_BGR2GRAY)
-
-            # Daylight
             #mask_white = cv2.inRange(gray, 190, 255)
-            # Night
-            #mask_white = cv2.inRange(gray, 80, 255)
-            # Night + Headlights
-            #mask_white = cv2.inRange(gray, 205, 255)
-
             #output = cv2.bitwise_and(gray, mask_white)
+            #_, thresh = cv2.threshold(output, threshold, 255, cv2.THRESH_BINARY)
 
-            # Using HSV
-            # Daylight
+            ##########################
+            # Using HSV Segmentation #
+            ##########################
+            hsv = cv2.cvtColor(hough_img, cv2.COLOR_BGR2HSV)
             lower_white = np.array([75, 0, 230])
             upper_white = np.array([255, 255, 255])
-
             mask_white = cv2.inRange(hsv, lower_white, upper_white)
             output = cv2.bitwise_and(hsv, hsv, mask=mask_white)
-
-            # Thresholding image post segmentation into binary values
-            threshold = 20
             gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
             _, thresh = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)
 
@@ -92,8 +91,6 @@ class image_converter:
             else:
                 output = output[height:np.size(output, 0), 0:np.size(output, 1)]
                 cv_image = cv_image[(np.size(cv_image, 0))/2:np.size(cv_image, 0), 0:np.size(cv_image, 1)]
-
-            #_, thresh = cv2.threshold(output, threshold, 255, cv2.THRESH_BINARY)
 
             # To view segmentation output
             #cv2.imshow("Segmentation", output)
