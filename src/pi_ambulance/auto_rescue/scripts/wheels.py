@@ -81,10 +81,10 @@ class wheels_controller:
         elif(direction == 0):
             forward(left, right)
 
-        elif (direction == 1):
+        elif (direction == 2):
             rotate_right_90(left, right)
 
-        elif (direction == 2):
+        elif (direction == 1):
             rotate_left_90(left, right)
 
         else:

@@ -1,0 +1,5 @@
+<launch>
+	<include file="$(find auto_rescue)/launch/imu.launch"/>
+	<include file="$(find auto_rescue)/launch/cam.launch"/>
+	<include file="$(find auto_rescue)/launch/pid_code.launch"/>
+</launch>

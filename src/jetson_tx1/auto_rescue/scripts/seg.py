@@ -49,27 +49,9 @@ class image_converter:
 
             # Converting Image to HSV and Grayscale Images
             kernel = np.ones((5, 5), np.uint8)
-            hsv = cv2.cvtColor(hough_img, cv2.COLOR_BGR2HSV)
             gray = cv2.cvtColor(hough_img, cv2.COLOR_BGR2GRAY)
             #img_dilation = cv2.dilate(gray, kernel, iterations= 1)
             gray = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, kernel)
-
-            # White Daylight
-            #lower_white = np.array([0, 0, 0])
-            #upper_white = np.array([0, 0, 255])
-
-            # White Night
-            #sensitiviy = 110
-            #lower_white = np.array([0, 0, 255 - sensitiviy])
-            #upper_white = np.array([255, sensitiviy, 255])
-
-            # Yellow Masks
-            # lower_yellow = np.array([20, 100, 100])
-            # upper_yellow = np.array([30, 255, 255])
-            # lower_yellow = np.array([20, 100, 100])
-            # upper_yellow = np.array([30, 255, 255])
-
-            #mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
             # Daylight
             mask_white = cv2.inRange(gray, 180, 255)
@@ -78,9 +60,6 @@ class image_converter:
             # Lab - Night
             #mask_white = cv2.inRange(gray, 200, 255)
 
-            #mask_yw = cv2.bitwise_or(mask_white, mask_yellow)
-            #mask_white = cv2.inRange(hsv, lower_white, upper_white)
-            #output = cv2.bitwise_and(hsv, hsv, mask=mask_white)
             output = cv2.bitwise_and(gray, mask_white)
 
             # Declarion of cam center's width

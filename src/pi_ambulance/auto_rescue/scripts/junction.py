@@ -57,7 +57,9 @@ class image_converter:
 			hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 			# Daylight - Shade Yellow Masks
-			lower_yellow = np.array([15, 40, 80])
+			lower_yellow = np.array([15, 60, 150])
+			# Daylight - Lab
+			#lower_yellow = np.array([15, 30, 80])
 			upper_yellow = np.array([45, 255, 255])
 
 			mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)

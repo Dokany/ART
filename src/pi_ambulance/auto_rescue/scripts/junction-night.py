@@ -53,11 +53,19 @@ class image_converter:
 			hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 			# Night Yellow Masks
-			lower_yellow = np.array([18, 100, 70])
-			upper_yellow = np.array([112, 255, 255])
+			# lower_yellow = np.array([18, 100, 70])
+			# upper_yellow = np.array([112, 255, 255])
             #Night with lights
-			#lower_yellow = np.array([19, 100, 70])
+			lower_yellow = np.array([15, 40, 170])
+			upper_yellow = np.array([60, 255, 255])
+
+			# Twilight with Lights
+			#lower_yellow = np.array([15, 40, 170])
 			#upper_yellow = np.array([112, 255, 255])
+
+			# Night Lab Masks
+			#lower_yellow = np.array([22, 190, 0])
+			#upper_yellow = np.array([40, 255, 255])
 
 			mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
 			seg_img = cv2.bitwise_and(hsv, hsv, mask=mask_yellow)
@@ -127,3 +135,4 @@ def main(args):
 
 if __name__=='__main__':
 	main(sys.argv)
+

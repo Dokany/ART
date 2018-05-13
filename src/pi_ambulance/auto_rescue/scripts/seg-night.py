@@ -54,18 +54,33 @@ class image_converter:
             hough_img = cv2.GaussianBlur(hough_img, (5, 5), 0)
             #hough_img = cv2.medianBlur(hough_img, 5)
             #hough_img = cv2.equalizeHist(hough_img)
+            threshold = 20
 
-            # Converting Image to HSV and Grayscale Images
-            gray = cv2.cvtColor(hough_img, cv2.COLOR_BGR2GRAY)
-
+            ############################################
+            # DO NOT USE: Using Grayscale Segmentation #
+            ############################################
+            # gray = cv2.cvtColor(hough_img, cv2.COLOR_BGR2GRAY)
             # Night
-            mask_white = cv2.inRange(gray, 110, 255)
+            #mask_white = cv2.inRange(gray, 110, 255)
             # Night + Headlights
             #mask_white = cv2.inRange(gray, 205, 255)
+            # output = cv2.bitwise_and(gray, mask_white)
+            # _, thresh = cv2.threshold(output, threshold, 255, cv2.THRESH_BINARY)
 
-            threshold = 12
-            output = cv2.bitwise_and(gray, mask_white)
-            _, thresh = cv2.threshold(output, threshold, 255, cv2.THRESH_BINARY)
+            ##########################
+            # Using HSV Segmentation #
+            #########################
+            hsv = cv2.cvtColor(hough_img, cv2.COLOR_BGR2HSV)
+            # Night - Lab
+            #lower_white = np.array([15, 110, 240])
+            #upper_white = np.array([30, 160, 255])
+            # Night - LEDs
+            lower_white = np.array([60, 0, 210])
+            upper_white = np.array([140, 255, 255])
+            mask_white = cv2.inRange(hsv, lower_white, upper_white)
+            output = cv2.bitwise_and(hsv, hsv, mask=mask_white)
+            gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
+            _, thresh = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)
 
             # Declarion of cam center's width
             width = np.size(output, 1) / 2
@@ -151,3 +166,4 @@ def main(args):
 
 if __name__=='__main__':
     main(sys.argv)
+

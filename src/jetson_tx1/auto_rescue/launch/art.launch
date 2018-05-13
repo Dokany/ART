@@ -1,0 +1,5 @@
+<launch>
+	<include file="$(find darknet_ros)/launch/darknet_ros.launch"/>
+	<include file="$(find auto_rescue)/launch/cam.launch"/>
+	<include file="$(find auto_rescue)/launch/pid_code.launch"/>
+</launch>

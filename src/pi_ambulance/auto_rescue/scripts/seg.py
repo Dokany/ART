@@ -58,23 +58,29 @@ class image_converter:
 
             threshold = 20
 
-            ################################
-            # Using Grayscale Segmentation #
-            ################################
+            ############################################
+            # DO NOT USE: Using Grayscale Segmentation #
+            ############################################
             #gray = cv2.cvtColor(hough_img, cv2.COLOR_BGR2GRAY)
-            #mask_white = cv2.inRange(gray, 190, 255)
+            #mask_white = cv2.inRange(gray, 180, 255)
             #output = cv2.bitwise_and(gray, mask_white)
             #_, thresh = cv2.threshold(output, threshold, 255, cv2.THRESH_BINARY)
 
             ##########################
             # Using HSV Segmentation #
-            ##########################
+            #########################
             hsv = cv2.cvtColor(hough_img, cv2.COLOR_BGR2HSV)
-            lower_white = np.array([75, 0, 230])
-            upper_white = np.array([255, 255, 255])
+            lower_white = np.array([50, 0, 240])
+            upper_white = np.array([165, 255, 255])
             mask_white = cv2.inRange(hsv, lower_white, upper_white)
             output = cv2.bitwise_and(hsv, hsv, mask=mask_white)
             gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
+
+            ########################
+            # Morphology for Noise #
+            ########################
+            #kernel = np.ones((5, 5), np.uint8)
+            #gray = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, kernel)
             _, thresh = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)
 
             # Declarion of cam center's width
@@ -85,7 +91,8 @@ class image_converter:
             # Upper Half
             upperHalf = self.upper
             if (upperHalf):
-                output = output[0:height, 0:np.size(output, 1)]
+                output =\
+                    output[0:height, 0:np.size(output, 1)]
                 cv_image = cv_image[0:(np.size(cv_image, 0))/2, 0:np.size(cv_image, 1)]
             # Lower Half
             else:
